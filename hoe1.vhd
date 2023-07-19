@@ -25,8 +25,8 @@ begin
                 when S_ON =>                 
                     if counter_on = 0 then 
                        state <= S_OFF;
-                       counter_on <= 299;
-                       counter_off <= 49699; 
+                       counter_on <= ON_TIME - 1;
+                       counter_off <= OFF_TIME - 1; 
                     else
                         counter_on <= counter_on - 1;
                         pulse_out <= '1' ;
