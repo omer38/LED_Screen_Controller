@@ -2,12 +2,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity hoe1_tb is
-
 end hoe1_tb;
 
 architecture Behavioral of hoe1_tb is
 
-component hoe1_sim is
+component hoe1 is
     Port (
         clk : in STD_LOGIC;
         pulse_out : out STD_LOGIC
@@ -20,7 +19,7 @@ constant clk_period: time  := 10ns;
 
 begin
 
-DUT : hoe1_sim
+DUT : hoe1
 port map(
 clk			=> clk		 ,
 pulse_out	=> pulse_out
