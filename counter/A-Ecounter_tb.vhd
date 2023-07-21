@@ -21,9 +21,9 @@ dut: UP_COUNTER port map (clk => clk, reset=>reset, counter => counter);
 clock_process :process
 begin
      clk <= '0';
-     wait for 40 ns;
+     wait for 10 ns;
      clk <= '1';
-     wait for 40 ns;
+     wait for 10 ns;
 end process;
 
 
@@ -32,7 +32,7 @@ stim_proc: process
 begin        
    -- hold reset state for 100 ns.
      reset <= '1';
-   wait for 80 ns;    
+   wait for 20 ns;    
     reset <= '0';
    wait;
 end process;
