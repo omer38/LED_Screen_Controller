@@ -108,12 +108,6 @@ if rising_edge(clk) then
                 dataout <= data_sig(0);
                 state <= idle; 
 
-
--- I changed from p_check  
---       when p_check =>
---               dataout <= data_sig(0) xor data_sig(0) xor data_sig(0) xor data_sig(0) xor data_sig(0) xor data_sig(0) xor 
---               data_sig(0) xor data_sig(0);
---               state <= idle;
        end case;
 end if;
 end process;
