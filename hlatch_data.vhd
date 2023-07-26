@@ -49,21 +49,27 @@ architecture Behavioral of hlatch_data is
 	
 	signal data_counter: integer range 0 to 4 := 3; -- it helps to divide 540 BCP to 135 cp which is off period 7+16*8=135
 	
-	signal en_zero_counter : integer range 0 to 24 := 23; -- 7*4 = 28
+	signal zero_counter : integer range 0 to 28 := 23; -- 7*4 = 28
 	
 	
     type t_state is (S_1,S_1_0,S_2,S_2_0,S_3,S_3_0,S_4,S_4_0,S_4_TO_5,S_5,S_5_0,OFF_STATE);
     signal state : t_state := S_1;
     signal pulse_mid : std_logic := '1';
     
-    type states is (idle,d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15);
+    type states is (idle,zero_state,d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15);
     signal d_state : states := idle;
     signal data_sig : std_logic_vector(15 downto 0);
     
     signal en   : std_logic := '0' ;
     --signal en_a   : std_logic := '0';
-	signal en_zero : integer range 0 to 2 := 1 ;
+	--signal en_zero : integer range 0 to 2 := 1 ;
+	--signal en_zero : std_logic := '1';
+	--signal en_zero_counter_1 : integer range 0 to 11 := 10;
+	--signal en_zero_counter_0 : integer range 0 to 539 := 538;
 	
+	--signal en_1 : std_logic := '0';
+	
+	signal en_zero : std_logic_vector(2 downto 0) := "000";
 begin
     process(clk)
     begin
@@ -151,6 +157,7 @@ begin
                     if counter_5_0 = 0 then
                         state <= S_5;
 						counter_5_0 <= OFF_TIME_5 - 1;
+						--en_1 <= '1';
                     else
                         counter_5_0 <= counter_5_0 - 1;
                         pulse_mid <= '0';
@@ -162,6 +169,7 @@ begin
                        counter_5 <= ON_TIME_5 - 1;
                        counter_5_0 <= OFF_TIME_5 - 1;
                        en <= '1';
+                       --en_zero <= 1;
                     else
                         counter_5 <= counter_5 - 1;
                         pulse_mid <= '1' ;
@@ -172,6 +180,7 @@ begin
                     if (counter_5_0 = 0 and counter_five_loop /= 0) then
                         state <= S_5;
 						counter_five_loop <= counter_five_loop - 1;
+						--en_zero <= 1;
 					elsif (counter_5_0 = 0 and counter_five_loop = 0) then
 						state <= OFF_STATE;
 						counter_five_loop <= 512;
@@ -180,6 +189,7 @@ begin
                     else
                         counter_5_0 <= counter_5_0 -1 ;
                         pulse_mid <= '0';
+                        --en_zero <= 0;
                     end if;
 				
 				when OFF_STATE => 
@@ -190,6 +200,7 @@ begin
                         counter_off <= counter_off -1 ;
                         pulse_mid <= '0';
                         en <= '0';
+                        --en_1 <= '0';
                     end if;
                 
              end case;
@@ -205,16 +216,35 @@ begin
                     --data_sig <= "000000000000000000000000";
                     dataout <= '0';
                     d_state <= idle;
-                elsif (load = '1' and en = '1') then
+                    
+                elsif (load = '1' and en = '1' and en_zero = "000" ) then
+                        dataout <= '0';
+                        d_state <= zero_state;
+                        en_zero <= en_zero + "001";
+                elsif (load = '1' and en = '1'and en_zero /= "000") then
                         dataout <= '0';
                         d_state <= d0;
-					end if;
-                
+                        en_zero <= en_zero + "001";
+--                elsif (load = '1' and en = '1' and en_zero = "000" ) then
+--                        dataout <= '0';
+--                        d_state <= zero_state;
+				end if;
+           when zero_state =>
+                if zero_counter = 0 then 
+                    d_state <= d0;
+                    dataout <= '0';
+                    zero_counter <= 23;
+                 else
+                    zero_counter <= zero_counter - 1;
+                    dataout <= '0';
+                 end if;     
+            
            when d0 =>
                     if data_counter = 0 then
                         dataout <= data_sig(15);
                         d_state <= d1;
                         data_counter <= 3;
+                       -- en_zero <= en_zero + "001";
                     else
                         data_counter <= data_counter - 1;
                     end if;
@@ -346,6 +376,23 @@ begin
            end case;
     end if;
     end process;
+ 
+-- process(clk) begin
+-- if rising_edge(clk) then
+--    if en_zero = 1 and en_1 = '1' then
+--        en_zero_counter_1 <= en_zero_counter_1 - 1;
+--        if en_zero_counter_1 = 0 then
+--            en_zero <= 0;
+--            en_zero_counter_0 <= en_zero_counter_0 - 1;
+--            if en_zero_counter_0 = 0 then
+--                en_zero_counter_1 <= 10;
+--                en_zero_counter_0 <= 533;
+--                en_zero <= 1;
+--            end if;
+--        end if;
+--    end if;
+-- end if;
+-- end process;
 	
     hlatch <= pulse_mid;
 	
