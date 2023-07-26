@@ -12,7 +12,7 @@ end UP_COUNTER;
 
 architecture Behavioral of UP_COUNTER is
 
-signal counter_up: std_logic_vector(4 downto 0);
+signal counter_up: std_logic_vector(4 downto 0) := "00000";
 signal counter_clk : integer range 0 to 1520 := 1519;
 
 begin
